@@ -77,11 +77,13 @@ def get_filesystem_for_path(path, mounts_file, statvfs_):
     path_segments = path.split("/")
     for info in get_mount_info(mounts_file, statvfs_):
         mount_segments = info["mount-point"].split("/")
-        if path.startswith(info["mount-point"]):
-            if ((not candidate) or
-                path_segments[:len(mount_segments)] == mount_segments
-                ):
-                candidate = info
+        if path.startswith(info["mount-point"]) and (
+            (
+                (not candidate)
+                or path_segments[: len(mount_segments)] == mount_segments
+            )
+        ):
+            candidate = info
     return candidate
 
 
@@ -109,9 +111,7 @@ def is_device_removable(device):
     except IOError:
         return False
 
-    if contents.strip() == "1":
-        return True
-    return False
+    return contents.strip() == "1"
 
 
 def _get_device_removable_file_path(device):
@@ -139,5 +139,4 @@ def _get_device_removable_file_path(device):
 
     device_name = matched.groups()[0]
 
-    removable_file = os.path.join("/sys/block/", device_name, "removable")
-    return removable_file
+    return os.path.join("/sys/block/", device_name, "removable")

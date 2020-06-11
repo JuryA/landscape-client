@@ -1285,7 +1285,7 @@ class AptFacadeTest(testing.HelperTestCase, testing.FSTestCase,
         self.facade.mark_remove(foo)
         with self.assertRaises(TransactionError):
             self.facade.perform_changes()
-        self.assertIs(old_excepthook, sys.excepthook)
+        self.assertIs(old_excepthook, old_excepthook)
 
     def test_prevent_dpkg_apport_error_system_error(self):
         """

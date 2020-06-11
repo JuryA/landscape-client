@@ -44,10 +44,7 @@ class ImportOptionError(ConfigurationError):
 def print_text(text, end="\n", error=False):
     """Display the given text to the user, using stderr if flagged as an error.
     """
-    if error:
-        stream = sys.stderr
-    else:
-        stream = sys.stdout
+    stream = sys.stderr if error else sys.stdout
     stream.write(text + end)
     stream.flush()
 
@@ -78,20 +75,22 @@ def get_invalid_users(users):
     Process a string with a list of comma separated usernames, this returns
     any usernames not known to the underlying user database.
     """
-    if users is not None:
-        user_list = [user.strip() for user in users.split(",")]
-        if "ALL" in user_list:
-            if len(user_list) > 1:
-                raise ConfigurationError(
-                    "Extra users specified with ALL users")
-            user_list.remove("ALL")
-        invalid_users = []
-        for user in user_list:
-            try:
-                pwd.getpwnam(user)
-            except KeyError:
-                invalid_users.append(user)
-        return invalid_users
+    if users is None:
+        return
+
+    user_list = [user.strip() for user in users.split(",")]
+    if "ALL" in user_list:
+        if len(user_list) > 1:
+            raise ConfigurationError(
+                "Extra users specified with ALL users")
+        user_list.remove("ALL")
+    invalid_users = []
+    for user in user_list:
+        try:
+            pwd.getpwnam(user)
+        except KeyError:
+            invalid_users.append(user)
+    return invalid_users
 
 
 class LandscapeSetupConfiguration(BrokerConfiguration):
@@ -106,43 +105,45 @@ class LandscapeSetupConfiguration(BrokerConfiguration):
         command line, with precedence being given to real command
         line options.
         """
-        if self.import_from:
-            parser = None
+        if not self.import_from:
+            return
 
-            try:
-                if "://" in self.import_from:
-                    # If it's from a URL, download it now.
-                    if self.http_proxy:
-                        os.environ["http_proxy"] = self.http_proxy
-                    if self.https_proxy:
-                        os.environ["https_proxy"] = self.https_proxy
-                    content = self.fetch_import_url(self.import_from)
-                    parser = self._get_config_object(
-                        alternative_config=io.StringIO(
-                            content.decode("utf-8")))
-                elif not os.path.isfile(self.import_from):
-                    raise ImportOptionError("File %s doesn't exist." %
-                                            self.import_from)
-                else:
-                    try:
-                        parser = self._get_config_object(
-                            alternative_config=self.import_from)
-                    except Exception:
-                        raise ImportOptionError(
-                            "Couldn't read configuration from %s." %
-                            self.import_from)
-            except Exception as error:
-                raise ImportOptionError(str(error))
+        parser = None
 
-            # But real command line options have precedence.
-            options = None
-            if parser and self.config_section in parser:
-                options = parser[self.config_section]
-            if not options:
-                raise ImportOptionError("Nothing to import at %s." %
+        try:
+            if "://" in self.import_from:
+                # If it's from a URL, download it now.
+                if self.http_proxy:
+                    os.environ["http_proxy"] = self.http_proxy
+                if self.https_proxy:
+                    os.environ["https_proxy"] = self.https_proxy
+                content = self.fetch_import_url(self.import_from)
+                parser = self._get_config_object(
+                    alternative_config=io.StringIO(
+                        content.decode("utf-8")))
+            elif not os.path.isfile(self.import_from):
+                raise ImportOptionError("File %s doesn't exist." %
                                         self.import_from)
-            options.update(self._command_line_options)
-            self._command_line_options = options
+            else:
+                try:
+                    parser = self._get_config_object(
+                        alternative_config=self.import_from)
+                except Exception:
+                    raise ImportOptionError(
+                        "Couldn't read configuration from %s." %
+                        self.import_from)
+        except Exception as error:
+            raise ImportOptionError(str(error))
+
+        # But real command line options have precedence.
+        options = None
+        if parser and self.config_section in parser:
+            options = parser[self.config_section]
+        if not options:
+            raise ImportOptionError("Nothing to import at %s." %
+                                    self.import_from)
+        options.update(self._command_line_options)
+        self._command_line_options = options
 
     def fetch_import_url(self, url):
         """Handle fetching of URLs passed to --url."""
@@ -234,10 +235,7 @@ class LandscapeSetupScript(object):
             before continuing.
         """
         default = getattr(self.config, option, None)
-        if default:
-            msg += " [%s]: " % default
-        else:
-            msg += ": "
+        msg += " [%s]: " % default if default else ": "
         required = required and not (bool(default))
         result = self.prompt_get_input(msg, required)
         if result:
@@ -485,10 +483,13 @@ def check_account_name_and_password(config):
     Ensure that silent configurations which plan to start landscape-client are
     have both an account_name and computer title.
     """
-    if config.silent and not config.no_start:
-        if not (config.get("account_name") and config.get("computer_title")):
-            raise ConfigurationError("An account name and computer title are "
-                                     "required.")
+    if (
+        config.silent
+        and not config.no_start
+        and not (config.get("account_name") and config.get("computer_title"))
+    ):
+        raise ConfigurationError("An account name and computer title are "
+                                 "required.")
 
 
 def check_script_users(config):

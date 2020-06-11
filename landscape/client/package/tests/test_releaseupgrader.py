@@ -778,10 +778,13 @@ class ReleaseUpgraderTest(LandscapeTest):
         The L{ReleaseUpgrader.handle_task} method doesn't take any action
         if the message carried by task is not known.
         """
-        message = {"type": "foo"}
 
-        class FakeTask(object):
+
+        class FakeTask((object)):
+            message = {"type": "foo"}
+
             data = message
+
 
         self.assertEqual(self.upgrader.handle_task(FakeTask()), None)
 

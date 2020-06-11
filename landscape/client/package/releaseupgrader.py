@@ -230,10 +230,7 @@ class ReleaseUpgrader(PackageTaskHandler):
             out = out.decode("utf-8")
             err = err.decode("utf-8")
 
-            if code == 0:
-                status = SUCCEEDED
-            else:
-                status = FAILED
+            status = SUCCEEDED if code == 0 else FAILED
             text = self.make_operation_result_text(out, err)
             message = self.make_operation_result_message(operation_id, status,
                                                          text, code)

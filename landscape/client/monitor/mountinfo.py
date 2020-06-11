@@ -105,9 +105,10 @@ class MountInfo(MonitorPlugin):
                 self._free_space.append((timestamp, mount_point, free_space))
 
             prev_mount_info = self._persist.get(("mount-info", mount_point))
-            if not prev_mount_info or prev_mount_info != mount_info:
-                if mount_info not in [m for t, m in self._mount_info]:
-                    self._mount_info.append((now, mount_info))
+            if (
+                not prev_mount_info or prev_mount_info != mount_info
+            ) and mount_info not in [m for t, m in self._mount_info]:
+                self._mount_info.append((now, mount_info))
 
             current_mount_points.add(mount_point)
 
@@ -132,7 +133,7 @@ class MountInfo(MonitorPlugin):
         by parsing /etc/mtab.
         """
         bound_points = set()
-        if not self._mtab_file or not os.path.isfile(self._mtab_file):
+        if not (self._mtab_file and os.path.isfile(self._mtab_file)):
             return bound_points
 
         file = open(self._mtab_file, "r")

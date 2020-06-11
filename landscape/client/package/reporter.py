@@ -291,12 +291,11 @@ class PackageReporter(PackageTaskHandler):
                         self.apt_update_filename, code, out, err))
 
                 if code != 0:
-                    if code == 100:
-                        if retry < len(LOCK_RETRY_DELAYS) - 1:
-                            logging.warning(
-                                "Could not acquire the apt lock. Retrying in"
-                                " %s seconds." % LOCK_RETRY_DELAYS[retry + 1])
-                            continue
+                    if code == 100 and retry < len(LOCK_RETRY_DELAYS) - 1:
+                        logging.warning(
+                            "Could not acquire the apt lock. Retrying in"
+                            " %s seconds." % LOCK_RETRY_DELAYS[retry + 1])
+                        continue
 
                     logging.warning("'%s' exited with status %d (%s)" % (
                         self.apt_update_filename, code, err))
@@ -361,7 +360,7 @@ class PackageReporter(PackageTaskHandler):
         if message_type == "package-ids":
             self._got_task = True
             return self._handle_package_ids(message)
-        if message_type == "resynchronize":
+        elif message_type == "resynchronize":
             self._got_task = True
             return self._handle_resynchronize()
 
@@ -583,9 +582,7 @@ class PackageReporter(PackageTaskHandler):
 
         status_file = apt_pkg.config.find_file("dir::state::status")
         lists_dir = apt_pkg.config.find_dir("dir::state::lists")
-        files = [status_file, lists_dir]
-        files.extend(glob.glob("%s/*Packages" % lists_dir))
-
+        files = [status_file, lists_dir, *glob.glob("%s/*Packages" % lists_dir)]
         last_checked = os.stat(stamp_file).st_mtime
         for f in files:
             last_changed = os.stat(f).st_mtime

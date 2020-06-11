@@ -100,8 +100,7 @@ def ranges_to_sequence(ranges):
             start, end = item
             if start > end:
                 raise ValueError("Range error %d > %d", start, end)
-            for item in xrange(start, end + 1):
-                yield item
+            yield from xrange(start, end + 1)
         else:
             yield item
 

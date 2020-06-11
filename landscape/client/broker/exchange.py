@@ -861,8 +861,7 @@ def get_accepted_types_diff(old_types, new_types):
     added_types = new_types - old_types
     stable_types = old_types & new_types
     removed_types = old_types - new_types
-    diff = []
-    diff.extend(["+%s" % type for type in added_types])
+    diff = ["+%s" % type for type in added_types]
     diff.extend(["%s" % type for type in stable_types])
     diff.extend(["-%s" % type for type in removed_types])
     return " ".join(diff)

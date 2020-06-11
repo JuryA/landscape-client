@@ -187,13 +187,7 @@ class Persist(object):
                 newobj = default
             else:
                 while True:
-                    if len(queue) > 0:
-                        if type(queue[0]) is int:
-                            newvalue = []
-                        else:
-                            newvalue = {}
-                    else:
-                        newvalue = setvalue
+                    newvalue = ([] if type(queue[0]) is int else {}) if queue else setvalue
                     newobj = self._backend.set(obj, elem, newvalue)
                     if newobj is NotImplemented:
                         raise PersistError("Can't traverse %r with %r" %
@@ -218,8 +212,8 @@ class Persist(object):
             value = self._traverse(self._softmap, path, marker)
             if value is marker:
                 value = self._traverse(self._hardmap, path, marker)
-                if value is marker:
-                    value = self._traverse(self._weakmap, path, marker)
+            if value is marker:
+                value = self._traverse(self._weakmap, path, marker)
         return value
 
     def has(self, path, value=NOTHING, soft=False, hard=False, weak=False):
@@ -328,7 +322,7 @@ class Persist(object):
             newpath = path_string_to_tuple(newpath)
         result = False
         marker = NOTHING
-        value = self._getvalue(oldpath, soft, not (soft or weak), weak)
+        value = self._getvalue(oldpath, soft, not soft and not weak, weak)
         if value is not marker:
             self.remove(oldpath, soft=soft, weak=weak)
             self.set(newpath, value, weak, soft)

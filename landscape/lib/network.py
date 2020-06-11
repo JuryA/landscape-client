@@ -158,8 +158,7 @@ def get_active_device_info(skipped_interfaces=("lo",),
             flags = get_flags(sock, interface.encode())
             if not is_up(flags):
                 continue
-            interface_info = {"interface": interface}
-            interface_info["flags"] = flags
+            interface_info = {"interface": interface, "flags": flags}
             speed, duplex = get_network_interface_speed(
                 sock, interface.encode())
             interface_info["speed"] = speed
@@ -222,9 +221,9 @@ def get_fqdn():
         fqdn = socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET,
                                   socket.SOCK_DGRAM, socket.IPPROTO_IP,
                                   socket.AI_CANONNAME)[0][3]
-        if "localhost" in fqdn:
-            # Another fallback
-            fqdn = socket.gethostname()
+    if "localhost" in fqdn:
+        # Another fallback
+        fqdn = socket.gethostname()
     return fqdn
 
 
@@ -252,7 +251,7 @@ def get_network_interface_speed(sock, interface_name):
         if e.errno == errno.EPERM:
             logging.warn("Could not determine network interface speed, "
                          "operation not permitted.")
-        elif e.errno != errno.EOPNOTSUPP and e.errno != errno.EINVAL:
+        elif e.errno not in [errno.EOPNOTSUPP, errno.EINVAL]:
             raise e
         speed = -1
         duplex = False

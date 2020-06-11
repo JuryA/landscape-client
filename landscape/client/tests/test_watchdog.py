@@ -337,7 +337,7 @@ class NonMockerWatchDogTests(LandscapeTest):
                        manager=AsynchronousPingDaemon("test-manager"))
         dog.start_monitoring()
 
-        for i in range(4):
+        for _ in range(4):
             clock.advance(5)
             dog.broker.fire_running(False)
             dog.monitor.fire_running(True)
@@ -372,7 +372,7 @@ class NonMockerWatchDogTests(LandscapeTest):
         dog.monitor.fire_running(True)
         dog.manager.fire_running(True)
 
-        for i in range(4):
+        for _ in range(4):
             clock.advance(5)
             dog.broker.fire_running(False)
             dog.monitor.fire_running(True)
@@ -414,7 +414,7 @@ class NonMockerWatchDogTests(LandscapeTest):
         dog.broker.stop = lambda: stop_result
         dog.start_monitoring()
 
-        for i in range(5):
+        for _ in range(5):
             clock.advance(5)
             dog.broker.fire_running(False)
 
@@ -436,7 +436,7 @@ class NonMockerWatchDogTests(LandscapeTest):
         dog.broker.stop = lambda: stop_result
         dog.start_monitoring()
 
-        for i in range(5):
+        for _ in range(5):
             clock.advance(5)
             dog.broker.fire_running(False)
 
@@ -462,12 +462,12 @@ class NonMockerWatchDogTests(LandscapeTest):
                        manager=BoringDaemon("test-manager"))
         dog.start_monitoring()
 
-        for i in range(5):
+        for _ in range(5):
             clock.advance(5)
             dog.broker.fire_running(False)
 
         self.assertEqual(dog.broker.boots, ["stop", "start"])
-        for i in range(4):
+        for _ in range(4):
             clock.advance(5)
             dog.broker.fire_running(False)
             self.assertEqual(dog.broker.boots, ["stop", "start"])

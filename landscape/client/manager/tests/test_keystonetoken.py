@@ -111,7 +111,7 @@ class KeystoneTokenTest(LandscapeTest):
         self.plugin._persist = FakePersist()
         self.plugin.client.broker.message_store.drop_session_ids()
         self.reactor.fire("resynchronize")
-        self.assertNotEqual(session_id, self.plugin._session_id)
+        self.assertNotEqual(session_id, session_id)
 
     def test_resynchronize_with_global_scope(self):
         """

@@ -111,10 +111,7 @@ VmallocChunk:   107432 kB
     def test_report_changed_hostnames(self):
 
         def hostname_factory(hostnames=["ooga", "wubble", "wubble"]):
-            i = 0
-            while i < len(hostnames):
-                yield hostnames[i]
-                i = i + 1
+            yield from hostnames
 
         self.mstore.set_accepted_types(["computer-info"])
         hostname_fact = hostname_factory()

@@ -349,7 +349,6 @@ class ProcessAccumulationProtocol(ProcessProtocol):
         L{ProcessTimeLimitReachedError} will be fired with data accumulated so
         far.
         """
-        exit_code = reason.value.exitCode
         # We get bytes with self.data, but want unicode with replace
         # characters. This is again attempted in
         # ScriptExecutionPlugin._respond, but it is not called in all cases.
@@ -362,6 +361,7 @@ class ProcessAccumulationProtocol(ProcessProtocol):
                 self._scheduled_cancel = None
                 self.reactor.cancel_call(scheduled)
 
+            exit_code = reason.value.exitCode
             if reason.check(ProcessDone):
                 self.result_deferred.callback(data)
             else:

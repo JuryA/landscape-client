@@ -104,10 +104,7 @@ class ProcessorInfo(MonitorPlugin):
         if processor["vendor"] != message.get("vendor", ""):
             return True
 
-        if processor["cache_size"] != message.get("cache-size", -1):
-            return True
-
-        return False
+        return processor["cache_size"] != message.get("cache-size", -1)
 
     def _update(self, processor, message):
         """Update the processor details with current values."""
@@ -175,14 +172,14 @@ class ARMMessageFactory:
                     key = match.group("key")
                     value = match.group("value")
 
-                    if key == "Processor":
+                    if key == "Cache size":
+                        current["cache-size"] = int(value)
+
+                    elif key == "Processor":
                         # ARM doesn't support SMP, thus no processor-id in
                         # the cpuinfo
                         current["processor-id"] = 0
                         current["model"] = value
-                    elif key == "Cache size":
-                        current["cache-size"] = int(value)
-
             if current:
                 processors.append(current)
         finally:

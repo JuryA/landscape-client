@@ -89,14 +89,8 @@ class Daemon(object):
             pwd_info = pwd.getpwnam(self.username)
             target_uid = pwd_info.pw_uid
             target_gid = pwd_info.pw_gid
-            if target_uid != my_uid:
-                self._uid = target_uid
-            else:
-                self._uid = None
-            if target_gid != os.getgid():
-                self._gid = target_gid
-            else:
-                self._gid = None
+            self._uid = target_uid if target_uid != my_uid else None
+            self._gid = target_gid if target_gid != os.getgid() else None
             self._env["HOME"] = pwd_info.pw_dir
             self._env["USER"] = self.username
             self._env["LOGNAME"] = self.username

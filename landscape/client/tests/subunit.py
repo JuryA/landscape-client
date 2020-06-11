@@ -139,8 +139,10 @@ class TestProtocolServer(object):
         """Call the appropriate local method for the received line."""
         if line == "]\n":
             self.endQuote(line)
-        elif (self.state == TestProtocolServer.READING_FAILURE or
-              self.state == TestProtocolServer.READING_ERROR):
+        elif self.state in [
+            TestProtocolServer.READING_FAILURE,
+            TestProtocolServer.READING_ERROR,
+        ]:
             self._appendMessage(line)
         else:
             parts = line.split(None, 1)

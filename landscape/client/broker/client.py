@@ -67,7 +67,7 @@ class BrokerClientPlugin(object):
         operations specific to their state within an implementation of the
         L{_reset} method.
         """
-        if not (scopes is None or self.scope in scopes):
+        if scopes is not None and self.scope not in scopes:
             # This resynchronize event is out of scope for us. Do nothing
             return succeed(None)
 

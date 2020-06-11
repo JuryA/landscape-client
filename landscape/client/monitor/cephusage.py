@@ -114,10 +114,7 @@ class CephUsage(MonitorPlugin):
 
         # Check if a ceph config file is available.
         # If it is not, it's not a ceph machine or ceph is not set up yet.
-        if self._ceph_config is None or not os.path.exists(self._ceph_config):
-            return False
-
-        return True
+        return bool(self._ceph_config is not None and os.path.exists(self._ceph_config))
 
     def _perform_rados_call(self):
         """The actual Rados interaction."""

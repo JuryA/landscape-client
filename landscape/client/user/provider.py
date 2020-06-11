@@ -61,7 +61,7 @@ class UserProviderBase(object):
         Each group is represented as a dict with the keys: C{name},
         C{gid} and C{members}.
         """
-        user_names = set([x["username"] for x in self.get_users()])
+        user_names = {x["username"] for x in self.get_users()}
         groups = []
         found_groupnames = set()
         for group in self.get_group_data():
@@ -124,10 +124,7 @@ class UserProvider(UserProviderBase):
         # decoding for Python 2 later after we have parsed the rows. We have to
         # explicitly indicate the encoding as we cannot rely on the system
         # default encoding.
-        if _PY3:
-            open_params = dict(encoding="utf-8", errors='replace')
-        else:
-            open_params = dict()
+        open_params = dict(encoding="utf-8", errors='replace') if _PY3 else dict()
         with open(self._passwd_file, "r", **open_params) as passwd_file:
             reader = csv.DictReader(
                 passwd_file, fieldnames=self.passwd_fields, delimiter=":",

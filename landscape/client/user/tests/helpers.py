@@ -31,11 +31,8 @@ class FakeUserManagement(object):
         try:
             uid = 1000
             if self._users:
-                uid = max([x["uid"] for x in itervalues(self._users)]) + 1
-            if self._groups:
-                primary_gid = self.get_gid(primary_group_name)
-            else:
-                primary_gid = uid
+                uid = max(x["uid"] for x in itervalues(self._users)) + 1
+            primary_gid = self.get_gid(primary_group_name) if self._groups else uid
             self._users[uid] = {"username": username, "name": name,
                                 "uid": uid, "enabled": True,
                                 "location": location, "work-phone": work_phone,
@@ -112,7 +109,7 @@ class FakeUserManagement(object):
     def add_group(self, name):
         gid = 1000
         if self._groups:
-            gid = max([x["gid"] for x in itervalues(self._groups)]) + 1
+            gid = max(x["gid"] for x in itervalues(self._groups)) + 1
         self._groups[name] = {"name": name, "gid": gid, "members": []}
         self.update_provider_from_groups()
         return "add_group succeeded"
@@ -147,9 +144,10 @@ class FakeUserManagement(object):
         return "remove_group succeeded"
 
     def update_provider_from_groups(self):
-        provider_list = []
-        for k, v in iteritems(self._groups):
-            provider_list.append((k, "x", v["gid"], v["members"]))
+        provider_list = [
+            (k, "x", v["gid"], v["members"]) for k, v in iteritems(self._groups)
+        ]
+
         self.provider.groups = provider_list
 
 

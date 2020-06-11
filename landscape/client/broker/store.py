@@ -443,7 +443,7 @@ class MessageStore(object):
         for message_dir in message_dirs:
             for filename in self._get_sorted_filenames(message_dir):
                 flags = set(self._get_flags(filename))
-                if (not exclude or not exclude & flags):
+                if not (exclude and exclude & flags):
                     yield self._message_dir(message_dir, filename)
 
     def _get_sorted_filenames(self, dir=""):

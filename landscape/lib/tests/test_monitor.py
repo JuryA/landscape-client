@@ -66,7 +66,7 @@ class MonitorTest(ReactorHavingTest):
         self.assertEqual(self.monitor.total_count, 3)
 
     def test_log(self):
-        for i in range(100):
+        for _ in range(100):
             self.monitor.ping()
             self.reactor.advance(1)
         self.monitor.log()
@@ -217,7 +217,7 @@ class CoverageMonitorTest(ReactorHavingTest):
         self.assertEqual(self.monitor.expected_count, 1.0)
 
     def test_log(self):
-        for i in range(100):
+        for _ in range(100):
             self.monitor.ping()
             self.reactor.advance(1)
         self.monitor.log()
@@ -226,7 +226,7 @@ class CoverageMonitorTest(ReactorHavingTest):
                         in self.logfile.getvalue())
 
     def test_log_warning(self):
-        for i in range(100):
+        for _ in range(100):
             self.reactor.advance(1)
         self.monitor.log()
         self.assertTrue("WARNING: 0 of 100 expected test events (0.00%) "

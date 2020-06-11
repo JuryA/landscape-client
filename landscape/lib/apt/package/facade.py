@@ -217,9 +217,10 @@ class AptFacade(object):
 
         @param version: The version of the package to unhold.
         """
-        if (not self.is_package_installed(version) or
-            not self._is_package_held(version.package)
-            ):
+        if not (
+            self.is_package_installed(version)
+            and self._is_package_held(version.package)
+        ):
             return
         self._set_dpkg_selections(version.package.name + " install")
 
@@ -452,7 +453,7 @@ class AptFacade(object):
 
     def is_package_upgrade(self, version):
         """Is the package an upgrade for another installed package?"""
-        if not version.package.is_upgradable or not version.package.installed:
+        if not (version.package.is_upgradable and version.package.installed):
             return False
         return version > version.package.installed
 
@@ -496,18 +497,18 @@ class AptFacade(object):
         """
         if package.is_inst_broken:
             return True
-        if (not package.marked_install and
-            not package.marked_upgrade and
-            not package.marked_downgrade
-            ):
+        if not (
+            package.marked_install
+            or package.marked_upgrade
+            or package.marked_downgrade
+        ):
             return package in self._package_installs
         return False
 
     def _get_broken_packages(self):
         """Return the packages that are in a broken state."""
-        return set(
-            version.package for version in self.get_packages()
-            if self._is_package_broken(version.package))
+        return {version.package for version in self.get_packages()
+                if self._is_package_broken(version.package)}
 
     def _get_changed_versions(self, package):
         """Return the versions that will be changed for the package.
@@ -763,12 +764,10 @@ class AptFacade(object):
     def _preprocess_removes(self, fixer):
         held_package_names = set()
 
-        package_installs = set(
-            version.package for version in self._version_installs)
+        package_installs = {version.package for version in self._version_installs}
 
-        package_upgrades = set(
-            version.package for version in self._version_removals
-            if version.package in package_installs)
+        package_upgrades = {version.package for version in self._version_removals
+                if version.package in package_installs}
 
         for version in self._version_removals:
             if self._is_package_held(version.package):
@@ -818,7 +817,7 @@ class AptFacade(object):
     def _preprocess_package_changes(self):
         version_changes = self._version_installs[:]
         version_changes.extend(self._version_removals)
-        if (not version_changes and not self._global_upgrade):
+        if not (version_changes or self._global_upgrade):
             return []
         already_broken_packages = self._get_broken_packages()
         fixer = apt_pkg.ProblemResolver(self._cache._depcache)
@@ -849,7 +848,7 @@ class AptFacade(object):
             results.append(package_result_text)
         if hold_result_text is not None:
             results.append(hold_result_text)
-        if len(results) > 0:
+        if results:
             return " ".join(results)
 
     def reset_marks(self):

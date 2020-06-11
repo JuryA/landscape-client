@@ -132,9 +132,7 @@ class Tuple(object):
         if len(value) != len(self.schema):
             raise InvalidError("Need %s items, got %s in %r"
                                % (len(self.schema), len(value), value))
-        new_value = []
-        for schema, value in zip(self.schema, value):
-            new_value.append(schema.coerce(value))
+        new_value = [schema.coerce(value) for schema, value in zip(self.schema, value)]
         return tuple(new_value)
 
 
