@@ -62,11 +62,11 @@ class AllOutputProcessProtocol(ProcessProtocol):
         out = self.outBuf.getvalue()
         err = self.errBuf.getvalue()
         e = reason.value
-        code = e.exitCode
         if e.signal:
             failure = Failure(SignalError(out, err, e.signal))
             self.deferred.errback(failure)
         else:
+            code = e.exitCode
             self.deferred.callback((out, err, code))
 
 

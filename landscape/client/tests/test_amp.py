@@ -95,7 +95,6 @@ class ComponentConnectorTest(LandscapeTest):
         deferred = self.connector.connect(max_retries=2)
         self.assertNoResult(deferred)
         return
-        self.failureResultOf(deferred).trap(ConnectError)
 
     def test_connect_logs_errors(self):
         """

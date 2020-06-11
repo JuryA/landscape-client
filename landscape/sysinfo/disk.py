@@ -42,10 +42,7 @@ class Disk(object):
                 if root_main_info is not None:
                     total = root_main_info["total-space"]
                     main_info = root_main_info
-            if total <= 0:
-                main_usage = "unknown"
-            else:
-                main_usage = usage(main_info)
+            main_usage = "unknown" if total <= 0 else usage(main_info)
             self._sysinfo.add_header("Usage of " + main_info["mount-point"],
                                      main_usage)
         else:

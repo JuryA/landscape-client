@@ -343,10 +343,13 @@ class PackageChanger(PackageTaskHandler):
         """
         Create a response and dispatch to the broker.
         """
-        response = {"type": "change-packages-result",
-                    "operation-id": message.get("operation-id")}
+        response = {
+            "type": "change-packages-result",
+            "operation-id": message.get("operation-id"),
+            "result-code": package_change_result.code,
+        }
 
-        response["result-code"] = package_change_result.code
+
         if package_change_result.text:
             response["result-text"] = package_change_result.text
         if package_change_result.installs:

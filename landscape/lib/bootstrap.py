@@ -33,16 +33,8 @@ class BootstrapPath(object):
             os.chmod(path, self.mode)
 
         if os.getuid() == 0:
-            if self.username is not None:
-                uid = pwd.getpwnam(self.username).pw_uid
-            else:
-                uid = -1
-
-            if self.group is not None:
-                gid = grp.getgrnam(self.group).gr_gid
-            else:
-                gid = -1
-
+            uid = pwd.getpwnam(self.username).pw_uid if self.username is not None else -1
+            gid = grp.getgrnam(self.group).gr_gid if self.group is not None else -1
             if uid != -1 or gid != -1:
                 os.chown(path, uid, gid)
 

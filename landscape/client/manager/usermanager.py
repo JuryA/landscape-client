@@ -58,9 +58,8 @@ class UserManager(ManagerPlugin):
                 shadow_file = open(self._shadow_file, "r")
                 for line in shadow_file:
                     parts = line.split(":")
-                    if len(parts) > 1:
-                        if parts[1].startswith("!"):
-                            locked_users.append(parts[0].strip())
+                    if len(parts) > 1 and parts[1].startswith("!"):
+                        locked_users.append(parts[0].strip())
             except IOError as e:
                 logging.error("Error reading shadow file. %s" % e)
         return locked_users

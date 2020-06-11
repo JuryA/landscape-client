@@ -116,6 +116,4 @@ def get_component_registry():
         RemoteMonitorConnector,
         RemoteManagerConnector
     ]
-    return dict(
-        (connector.component.name, connector)
-        for connector in all_connectors)
+    return {connector.component.name: connector for connector in all_connectors}

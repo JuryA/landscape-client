@@ -373,7 +373,7 @@ class LoginInfoReaderTest(BaseTestCase):
             reader = LoginInfoReader(file)
             count = 0
 
-            for info in reader.login_info():
+            for _ in reader.login_info():
                 count += 1
 
             self.assertEqual(count, 2)

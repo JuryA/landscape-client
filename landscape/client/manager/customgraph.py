@@ -151,11 +151,10 @@ class CustomGraphPlugin(ManagerPlugin, ScriptRunnerMixin):
         self.do_send = False
         graphs = list(self.registry.store.get_graphs())
         for graph_id, filename, user in graphs:
-            if graph_id not in self._data:
-                if os.path.isfile(filename):
-                    script_hash = self._get_script_hash(filename)
-                    self._data[graph_id] = {
-                        "values": [], "error": u"", "script-hash": script_hash}
+            if graph_id not in self._data and os.path.isfile(filename):
+                script_hash = self._get_script_hash(filename)
+                self._data[graph_id] = {
+                    "values": [], "error": u"", "script-hash": script_hash}
 
         message = {"type": self.message_type, "data": self._data}
 

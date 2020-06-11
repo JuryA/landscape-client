@@ -62,9 +62,11 @@ def event(method):
     event_type = method.__name__.replace("_", "-")
 
     def broadcast_event(self, *args, **kwargs):
-        fired = []
-        for client in self.get_clients():
-            fired.append(client.fire_event(event_type, *args, **kwargs))
+        fired = [
+            client.fire_event(event_type, *args, **kwargs)
+            for client in self.get_clients()
+        ]
+
         return gather_results(fired)
 
     return broadcast_event
@@ -345,9 +347,7 @@ class BrokerServer(object):
 
         @see: L{register_plugin}.
         """
-        results = []
-        for client in self.get_clients():
-            results.append(client.message(message))
+        results = [client.message(message) for client in self.get_clients()]
         result = gather_results(results)
         return result.addCallback(self._message_delivered, message)
 

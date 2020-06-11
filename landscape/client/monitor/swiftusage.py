@@ -93,10 +93,7 @@ class SwiftUsage(MonitorPlugin):
 
         # Check for object ring config file.
         # If it is not present, it's not a Swift machine or it not yet set up.
-        if not os.path.exists(self._swift_ring):
-            return False
-
-        return True
+        return bool(os.path.exists(self._swift_ring))
 
     def _get_recon_host(self):
         """Return a tuple with Recon (host, port)."""
@@ -119,10 +116,9 @@ class SwiftUsage(MonitorPlugin):
         scout = Scout("diskusage")
         # Perform the actual call
         scout_result = scout.scout(host)
-        disk_usage = scout_result[1]
         status_code = scout_result[2]
         if status_code == 200:
-            return disk_usage
+            return scout_result[1]
 
     def _handle_usage(self, disk_usage):
         if disk_usage is None:

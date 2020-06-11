@@ -15,10 +15,7 @@ def get_user_info(username=None):
     gid = None
     path = None
     if username is not None:
-        if _PY3:
-            username_str = username
-        else:
-            username_str = encode_if_needed(username)
+        username_str = username if _PY3 else encode_if_needed(username)
         try:
             # XXX: We have a situation with the system default FS encoding with
             # Python 3 here: We have to pass a string to pwd.getpwnam(), but if

@@ -280,9 +280,8 @@ class MethodCallSender(object):
             for chunk in chunks[:-1]:
 
                 def create_send_chunk(sequence, chunk):
-                    send_chunk = (lambda x: self._protocol.callRemote(
+                    return (lambda x: self._protocol.callRemote(
                         MethodCallChunk, sequence=sequence, chunk=chunk))
-                    return send_chunk
 
                 result.addCallback(create_send_chunk(sequence, chunk))
 
@@ -555,8 +554,7 @@ class MethodCallClientFactory(ReconnectingClientFactory):
 
     def buildProtocol(self, addr):
         self.resetDelay()
-        protocol = ReconnectingClientFactory.buildProtocol(self, addr)
-        return protocol
+        return ReconnectingClientFactory.buildProtocol(self, addr)
 
     def _fire_requests(self, result):
         """

@@ -180,10 +180,11 @@ class FrequencyMonitor(Monitor):
         self.reset()
 
     def warn(self):
-        if self.repeat_interval and self.min_frequency:
-            if ((self._create_time() - self._last_count >=
-                 self.repeat_interval) and
-                self.count < self.min_frequency
-                ):
-                return True
-        return False
+        return bool(
+            self.repeat_interval
+            and self.min_frequency
+            and (
+                (self._create_time() - self._last_count >= self.repeat_interval)
+                and self.count < self.min_frequency
+            )
+        )
